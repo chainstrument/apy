@@ -20,7 +20,6 @@ def generate_video():
     try:
         # Récupérer les paramètres de l'URL
         text = request.args.get('text', default="Ceci est un texte par défaut")
-        duration = int(request.args.get('duration', default=5))  # Durée en secondes
 
         # Lire les images du dossier "images"
         image_files = [os.path.join(images_folder, f) for f in os.listdir(images_folder) 
@@ -40,42 +39,49 @@ def generate_video():
         # Créer une vidéo à partir des images redimensionnées
         clip = ImageSequenceClip(resized_images, fps=1)
 
-        # Lire la bande son du dossier "sound"
-        audio_files = [os.path.join(sound_folder, f) for f in os.listdir(sound_folder) 
-                       if f.endswith('.mp3') or f.endswith('.wav')]
-        if audio_files:
-            background_audio = AudioFileClip(audio_files[0])  # Utiliser le premier fichier audio trouvé
-        else:
-            background_audio = None
-
         # Générer une voix à partir du texte
         tts = gTTS(text, lang='fr')  # Générer la voix en français
         tts_path = os.path.join(output_folder, "tts_audio.mp3")
         tts.save(tts_path)
         tts_audio = AudioFileClip(tts_path)
 
-        # Combiner les pistes audio
-        if background_audio or tts_audio:
-            audio_clips = []
-            if background_audio:
-                audio_clips.append(background_audio)
-            if tts_audio:
-                audio_clips.append(tts_audio)
-            final_audio = CompositeAudioClip(audio_clips)
-            clip = clip.set_audio(final_audio)
+        # Calculer la durée de la vidéo en fonction de la durée de l'audio
+        video_duration = tts_audio.duration
+        clip = clip.set_duration(video_duration)
 
-        # Ajouter du texte à la vidéo
-        txt_clip = TextClip(text, fontsize=50, color='white', bg_color='black')
-        txt_clip = txt_clip.set_position('bottom').set_duration(clip.duration)
-        clip = CompositeVideoClip([clip, txt_clip])
+        # Ajouter le texte mot par mot en synchronisation avec la voix
+        words = text.split()
+        word_duration = video_duration / len(words)  # Durée d'affichage par mot
+        text_clips = []
 
-        # Ajuster la durée de la vidéo
-        if duration > 0:
-            clip = clip.set_duration(duration)
+        for i, word in enumerate(words):
+            start_time = i * word_duration
+            end_time = (i + 1) * word_duration
+
+            # Créer un clip texte pour chaque mot
+            txt_clip = TextClip(
+                " ".join(words[:i + 1]),  # Afficher les mots jusqu'à l'index actuel
+                fontsize=70,  # Taille du texte
+                color='yellow',  # Couleur du texte
+                font='DejaVuSans-Bold',  # Police en gras
+                stroke_color='black',  # Couleur de la bordure
+                stroke_width=2  # Épaisseur de la bordure
+            )
+            txt_clip = txt_clip.set_position('center').set_duration(end_time - start_time).set_start(start_time)
+            text_clips.append(txt_clip)
+
+        # Combiner les clips texte
+        final_text_clip = CompositeVideoClip(text_clips)
+
+        # Combiner la vidéo et le texte
+        final_clip = CompositeVideoClip([clip, final_text_clip])
+
+        # Ajouter l'audio à la vidéo
+        final_clip = final_clip.set_audio(tts_audio)
 
         # Sauvegarder la vidéo finale
         video_path = os.path.join(output_folder, "output_video.mp4")
-        clip.write_videofile(video_path, codec='libx264')
+        final_clip.write_videofile(video_path, codec='libx264')
 
         # Renvoyer la vidéo générée
         return send_file(video_path, as_attachment=True)
