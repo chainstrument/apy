@@ -3,6 +3,7 @@ services:
   app:
     build: .
     volumes:
-      - ./output:/app/output  # Monte le dossier local "output" dans /app/output du conteneur
       - ./images:/app/images  # Monte le dossier local "images" dans /app/images du conteneur
+      - ./resized_images:/app/resized_images  # Monte le dossier local "resized_images" dans /app/resized_images
+      - ./output:/app/output  # du conteneur
     command: python app.py
