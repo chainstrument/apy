@@ -1,7 +1,7 @@
 from moviepy.editor import ImageSequenceClip
 
 # Liste des chemins des images
-image_files = ['image1.jpg', 'image2.jpg', 'image3.jpg']
+image_files = ['images/image1.jpg', 'images/image2.jpg', 'images/image3.jpg']
 
 # Créer une vidéo à partir des images
 clip = ImageSequenceClip(image_files, fps=1)

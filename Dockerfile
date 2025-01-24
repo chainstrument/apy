@@ -1,21 +1,20 @@
-# Utiliser une image Python officielle
-FROM python:3.9-slim
+FROM python:3.9
 
 # Installer les dépendances système
 RUN apt-get update && apt-get install -y \
-    libgl1 \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Définir le répertoire de travail dans le conteneur
+# Définir le répertoire de travail
 WORKDIR /app
 
-# Copier les fichiers nécessaires dans le conteneur
+# Copier les fichiers nécessaires
 COPY requirements.txt .
 COPY app.py .
+COPY images/ ./images/
 
-# Installer les dépendances Python
+# Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Commande à exécuter lorsque le conteneur démarre
+# Commande à exécuter
 CMD ["python", "app.py"]
