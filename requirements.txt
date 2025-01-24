@@ -1,5 +1,6 @@
 Flask==2.0.3
-Werkzeug==2.0.3
+Werkzeug==2.0.3  # Version compatible avec Flask 2.0.3
 moviepy==1.0.3
-opencv-python
-pillow
+Pillow==10.0.0
+opencv-python==4.5.5.64
+gTTS==2.3.2

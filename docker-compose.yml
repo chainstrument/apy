@@ -2,8 +2,11 @@ version: '3.8'
 services:
   app:
     build: .
+    ports:
+      - "5000:5000"  # Exposer le port 5000 de l'API
     volumes:
       - ./images:/app/images  # Monte le dossier local "images" dans /app/images du conteneur
       - ./resized_images:/app/resized_images  # Monte le dossier local "resized_images" dans /app/resized_images
       - ./output:/app/output  # du conteneur
+      - ./sound:/app/sound    # Monter le dossier local "sound" dans /app/sound du conteneur
     command: python app.py

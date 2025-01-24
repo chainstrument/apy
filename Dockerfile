@@ -16,5 +16,8 @@ COPY images/ ./images/
 # Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Exposer le port 5000
+EXPOSE 5000
+
 # Commande à exécuter
 CMD ["python", "app.py"]
