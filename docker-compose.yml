@@ -1,0 +1,7 @@
+version: '3.8'
+services:
+  app:
+    build: .
+    volumes:
+      - ./output:/app/output  # Monte le dossier local "output" dans /app/output du conteneur
+    command: python app.py

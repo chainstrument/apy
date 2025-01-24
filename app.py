@@ -1,14 +1,13 @@
-# main.py
-from flask import Flask
+from moviepy.editor import ImageSequenceClip
 
-# Créer une instance de l'application Flask
-app = Flask(__name__)
+# Liste des chemins des images
+image_files = ['image1.jpg', 'image2.jpg', 'image3.jpg']
 
-# Définir une route pour la racine ("/")
-@app.route('/')
-def hello():
-    return "Bonjdour, Flask !"
+# Créer une vidéo à partir des images
+clip = ImageSequenceClip(image_files, fps=1)
 
-# Démarrer le serveur Flask
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000)
+# Sauvegarder la vidéo dans le dossier monté
+output_path = "/app/output/output_video.mp4"
+clip.write_videofile(output_path)
+
+print(f"Vidéo générée : {output_path}")
